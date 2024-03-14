@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "PhoneBook.h"
+#include "PhoneBook.hpp"
+#include "Contact.hpp"
 
 /* Function to set contact data for each contact variable */
 int set_contact_data(std::string prompt, std::string &data)

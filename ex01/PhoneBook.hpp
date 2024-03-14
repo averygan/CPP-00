@@ -10,7 +10,20 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "PhoneBook.h"
+#ifndef PHONEBOOK_HPP
+#define PHONEBOOK_HPP
+
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <limits>
+#include <iomanip>
+#include "Contact.hpp"
+
+#define SEARCH_WIDTH 17
+#define MAX_CONTACTS 8
+#define MAX_INDEX 7
+#define B_GREEN "\033[1;32m"
 
 class PhoneBook 
 {
@@ -18,3 +31,5 @@ public:
 	Contact contacts[8];
 	int index;
 };
+
+#endif

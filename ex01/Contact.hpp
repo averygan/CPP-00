@@ -10,7 +10,19 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "PhoneBook.h"
+#ifndef CONTACT_HPP
+#define CONTACT_HPP
+
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <limits>
+#include <iomanip>
+#include "PhoneBook.hpp"
+
+#ifndef B_GREEN
+#define B_GREEN "\033[1;32m"
+#endif
 
 class Contact
 {
@@ -22,3 +34,5 @@ public:
 	std::string phone_number;
 	std::string darkest_secret;
 };
+
+#endif
