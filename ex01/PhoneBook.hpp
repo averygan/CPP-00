@@ -18,7 +18,9 @@
 #include <cstring>
 #include <limits>
 #include <iomanip>
+#include <cstdlib>
 #include "Contact.hpp"
+
 
 #define SEARCH_WIDTH 17
 #define MAX_CONTACTS 8
@@ -27,9 +29,19 @@
 
 class PhoneBook 
 {
-public:
+private:
 	Contact contacts[8];
 	int index;
+
+public:
+	PhoneBook();
+	int search();
+	void print_contact(int i);
+	void add_contact(Contact& new_contact);
+	int within_range(int i);
+	void display_contacts();
 };
+
+void print_header(std::string header);
 
 #endif

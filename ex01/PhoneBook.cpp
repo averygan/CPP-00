@@ -13,35 +13,47 @@
 #include "PhoneBook.hpp"
 #include "Contact.hpp"
 
-/* Function to set contact data for each contact variable */
-int set_contact_data(std::string prompt, std::string &data)
+PhoneBook::PhoneBook()
 {
-	std::cout << "Enter " << prompt << ": ";
-	std::getline(std::cin, data);
-	if (std::cin.eof())
+	index = 0;
+}
+
+/* Function to set contact data for each contact variable */
+std::string set_contact_data(std::string prompt)
+{
+	std::string input; 
+
+	while (input.empty())
 	{
-		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-		return 0;
+		if (std::cin.eof())
+		{
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+			return input;
+		}
+		std::cout << "Enter " << prompt << ": ";
+		std::getline(std::cin, input);
+		if (input.empty() && !std::cin.eof())
+			std::cout << "Please enter a valid " << prompt << std::endl;
 	}
-	return 1;
+	return input;
 }
 
 /* Function to add contact to phonebook */
-void add_contact(PhoneBook& pb, Contact& new_contact)
+void PhoneBook::add_contact(Contact& new_contact)
 {
-	if (pb.index < MAX_CONTACTS)
+	if (index < MAX_CONTACTS)
 	{
-		new_contact.index = pb.index;
-		pb.contacts[pb.index] = new_contact;
-		pb.index++;
+		new_contact.set_index(index);
+		contacts[index] = new_contact;
+		index++;
 		std::cout << "Contact added!" << std::endl;
 	}
 	else
 	{
-		new_contact.index = pb.index % MAX_CONTACTS;
-		pb.contacts[pb.index % MAX_CONTACTS] = new_contact;
-		pb.index++;
+		new_contact.set_index(index % MAX_CONTACTS);
+		contacts[index % MAX_CONTACTS] = new_contact;
+		index++;
 		std::cout << "Contact list full - Oldest contact replaced." << std::endl;
 	}
 }
@@ -58,37 +70,17 @@ void get_method(std::string& method)
 	}
 }
 
-/* Function for add method */
-int add(PhoneBook& pb)
+/* Function to print contact indicated by search index */
+void PhoneBook::print_contact(int i)
 {
-	Contact new_contact;
-
-	if (!set_contact_data("first name", new_contact.first_name) 
-		|| !set_contact_data("last name", new_contact.last_name) 
-		|| !set_contact_data("nickname", new_contact.nickname)
-		|| !set_contact_data("phone number", new_contact.phone_number)
-		|| !set_contact_data("darkest secret", new_contact.darkest_secret))
-		return 0;
-	if (!new_contact.first_name.empty() && !new_contact.last_name.empty() && \
-		!new_contact.nickname.empty()
-		&& !new_contact.phone_number.empty() && \
-		!new_contact.darkest_secret.empty())
-		add_contact(pb, new_contact);
-	else
-		std::cout << "Unable to add contacts: did not receive all required information." << std::endl;
-	return 1;
-}
-
-/* Function to print headers of search */
-void print_header(std::string header)
-{
-	if (header == "Nickname")
-	    std::cout << std::setw(10) << header << std::endl;
-	else
-	{
-		std::cout << std::setw(10) << header;
-		std::cout << "|";
-	}
+	std::cout << std::endl << "Results" << std::endl << "-----------------------" << std::endl;
+	std::cout << std::setw(SEARCH_WIDTH) << "Index: " << std::to_string(i) << std::endl;
+	std::cout << std::setw(SEARCH_WIDTH) << "First name: " << contacts[i].get_first_name() << std::endl;
+	std::cout << std::setw(SEARCH_WIDTH) << "Last name: " << contacts[i].get_last_name() << std::endl;
+	std::cout << std::setw(SEARCH_WIDTH) << "Nickname: " << contacts[i].get_nickname() << std::endl;
+	std::cout << std::setw(SEARCH_WIDTH) << "Phone number: " << contacts[i].get_phone_number() << std::endl;
+	std::cout << std::setw(SEARCH_WIDTH) << "Darkest secret: " << contacts[i].get_darkest_secret() << std::endl;
+	std::cout << std::endl;
 }
 
 /* Function to print contact in 4 columns */
@@ -111,37 +103,24 @@ void print_data(std::string data, int pipe)
 		std::cout << std::endl;
 }
 
-/* Function to print contact indicated by search index */
-void print_contact(int i, PhoneBook pb)
-{
-	std::cout << std::endl << "Results" << std::endl << "-----------------------" << std::endl;
-	std::cout << std::setw(SEARCH_WIDTH) << "Index: " << std::to_string(i) << std::endl;
-	std::cout << std::setw(SEARCH_WIDTH) << "First name: " << pb.contacts[i].first_name << std::endl;
-	std::cout << std::setw(SEARCH_WIDTH) << "Last name: " << pb.contacts[i].last_name << std::endl;
-	std::cout << std::setw(SEARCH_WIDTH) << "Nickname: " << pb.contacts[i].nickname << std::endl;
-	std::cout << std::setw(SEARCH_WIDTH) << "Phone number: " << pb.contacts[i].phone_number << std::endl;
-	std::cout << std::setw(SEARCH_WIDTH) << "Darkest secret: " << pb.contacts[i].darkest_secret << std::endl;
-	std::cout << std::endl;
-}
-
 /* Function to display headers and contacts */
-void display_contacts(PhoneBook pb)
+void PhoneBook::display_contacts()
 {
 	int j;
-	if (pb.index > MAX_INDEX)
+	if (index > MAX_INDEX)
 		j = MAX_CONTACTS;
 	else
-		j = pb.index;
+		j = index;
 	print_header("Index");
 	print_header("First name");
 	print_header("Last name");
 	print_header("Nickname");
 	for (int i = 0; i < j; i++)
 	{
-		print_data(std::to_string(pb.contacts[i].index), 1);
-		print_data(pb.contacts[i].first_name, 1);
-		print_data(pb.contacts[i].last_name, 1);
-		print_data(pb.contacts[i].nickname, 0);
+		print_data(std::to_string(contacts[i].get_index()), 1);
+		print_data(contacts[i].get_first_name(), 1);
+		print_data(contacts[i].get_last_name(), 1);
+		print_data(contacts[i].get_nickname(), 0);
 	}
 }
 
@@ -150,6 +129,8 @@ int is_numeric(std::string search)
 	int i;
 
 	i = 0;
+	if (search[i] == '-' || search[i] == '+')
+		i++;
 	while (search[i])
 	{
 		if (!isdigit(search[i]))
@@ -159,14 +140,14 @@ int is_numeric(std::string search)
 	return 1;
 }
 
-int within_range(PhoneBook pb, int i)
+int PhoneBook::within_range(int i)
 {
 	if (i < 0 || i >= MAX_CONTACTS)
 	{
 		std::cout << "Index is not within range.\n";
 		return 0;
 	}
-	else if (i > pb.index - 1)
+	else if (i > index - 1)
 	{
 		std::cout << "No contact with this index.\n";
 		return 0;
@@ -178,14 +159,14 @@ int within_range(PhoneBook pb, int i)
 Displays 4 columns
 Gets search index 
 Displays search results */
-int search(PhoneBook pb)
+int PhoneBook::search()
 {
 	int to_search;
 	std::string search;
 
 	to_search = -1;
-	display_contacts(pb);
-	if (pb.index == 0)
+	display_contacts();
+	if (index == 0)
 		return 1;
 	do 
 	{
@@ -198,14 +179,56 @@ int search(PhoneBook pb)
 			return 0;
 		}
 		if (!search.empty() && is_numeric(search))
-			to_search = std::stoi(search);
+		{
+			try
+			{
+				to_search = std::stoi(search);
+			}
+			catch(const std::exception& e)
+			{
+				to_search = -1;
+			}
+		}
 		if (!is_numeric(search))
 			std::cout << "Index is not numeric.\n";
 	}
-	while (!is_numeric(search) || !within_range(pb, to_search));
-	if (within_range(pb, to_search))
-		print_contact(to_search, pb);
+	while (!is_numeric(search) || !within_range(to_search));
+	if (within_range(to_search))
+		print_contact(to_search);
 	return 1;
+}
+
+/* Function for add method */
+int add(PhoneBook& pb)
+{
+	Contact new_contact;
+
+	new_contact.set_first_name(set_contact_data("first name"));
+	new_contact.set_last_name(set_contact_data("last name"));
+	new_contact.set_nickname(set_contact_data("nickname"));
+	new_contact.set_phone_number(set_contact_data("phone number"));
+	new_contact.set_darkest_secret(set_contact_data("darkest secret"));
+	if (!new_contact.Contact::get_last_name().empty() && 
+		!new_contact.Contact::get_first_name().empty() &&
+		!new_contact.Contact::get_nickname().empty() && 
+		!new_contact.Contact::get_phone_number().empty() &&
+		!new_contact.Contact::get_darkest_secret().empty())
+		pb.add_contact(new_contact);
+	else
+		return 0;
+	return 1;
+}
+
+/* Function to print headers of search */
+void print_header(std::string header)
+{
+	if (header == "Nickname")
+	    std::cout << std::setw(10) << header << std::endl;
+	else
+	{
+		std::cout << std::setw(10) << header;
+		std::cout << "|";
+	}
 }
 
 int main(void)
@@ -213,13 +236,12 @@ int main(void)
 	std::string method;
 	PhoneBook pb;
 
-	pb.index = 0;
 	while (1)
 	{
 		get_method(method);
 		if (method == "ADD" && !add(pb))
 			break;
-		else if (method == "SEARCH" && !search(pb))
+		else if (method == "SEARCH" && !pb.search())
 			break;
 		else if (method == "EXIT" || std::cin.eof())
 			break ;
